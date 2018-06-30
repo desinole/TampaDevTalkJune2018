@@ -10,16 +10,16 @@
 
 - Copy-paste in local settings file (where do you get Cosmos Connection string)
 
-'''csharP
-{
-  "IsEncrypted": false,
-  "Values": {
-    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "AzureWebJobsDashboard": "UseDevelopmentStorage=true",
-    "cosmosConnectionString": "AccountEndpoint=https://localhost:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="
-  }
-}
-'''
+    '''csharp
+        {
+          "IsEncrypted": false,
+          "Values": {
+            "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+            "AzureWebJobsDashboard": "UseDevelopmentStorage=true",
+            "cosmosConnectionString": "AccountEndpoint=https://localhost:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="
+          }
+        }
+    '''
 
 - Add HTTP trigger
 
@@ -31,34 +31,36 @@
 
 - Delete all code and add DocumentDB binding
 
-'''csharp
-[DocumentDB(databaseName:"salesdb",collectionName:"salescollection",CreateIfNotExists = true,CollectionThroughput = 1000,PartitionKey = "/sku",ConnectionStringSetting = "cosmosConnectionString")] IAsyncCollector<dynamic> outputDocument,
-'''
+    '''csharp
+        [DocumentDB(databaseName:"salesdb",collectionName:"salescollection",CreateIfNotExists = true,CollectionThroughput = 1000,PartitionKey = "/sku",ConnectionStringSetting = "cosmosConnectionString")] IAsyncCollector<dynamic> outputDocument,
+    '''
+
 - Add this code to body
 
-'''csharp
-            dynamic data = await req.Content.ReadAsAsync<object>();
-            await outputDocument.AddAsync(data);
-            return new HttpResponseMessage(HttpStatusCode.OK);
-'''
+    '''csharp
+      dynamic data = await req.Content.ReadAsAsync<object>();
+      await outputDocument.AddAsync(data);
+      return new HttpResponseMessage(HttpStatusCode.OK);
+    '''
 
 - Run with both examples of different schemes and show saved data
 
 - Add Cosmos trigger function with salesdb, salescollection and cosmosConnectionString
 
 - Add code
-'''csharp
-            if (documents != null && documents.Count > 0)
-            {
-                foreach (var document in documents)
-                {
-                    if (((dynamic)document).requires_shipping)
-                        log.Warning("Invoked shipping function");
-                    else
-                        log.Warning("No shipping!!!!");
-                }
-            }
-'''
+
+    '''csharp
+        if (documents != null && documents.Count > 0)
+        {
+          foreach (var document in documents)
+          {
+            if (((dynamic)document).requires_shipping)
+              log.Warning("Invoked shipping function");
+            else
+              log.Warning("No shipping!!!!");
+          }
+        }
+    '''
 
 - Run, will fail, set leasecollection to autocreate and run again
 
@@ -68,22 +70,21 @@
 
 - Add code
 
-'''csharp
+    '''csharp
       if (documents != null && documents.Count > 0)
-            {
-                foreach (var document in documents)
-                {
-                    if (((dynamic)document).taxable)
-                    {
-                        var tax = ((dynamic)document).price * 0.07;
-                        log.Warning($"Calculated tax {tax}");
-                    }
-                    else
-                        log.Warning($"No tax!!!");
-
-                }
-            }
-'''
+      {
+        foreach (var document in documents)
+        {
+          if (((dynamic)document).taxable)
+          {
+            var tax = ((dynamic)document).price * 0.07;
+            log.Warning($"Calculated tax {tax}");
+           }
+           else
+            log.Warning($"No tax!!!");
+          }
+        }
+    '''
 
 - Run, will fail, set leasecollection to autocreate and run again
 

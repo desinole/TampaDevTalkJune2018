@@ -10,7 +10,7 @@
 
 - Copy-paste in local settings file (where do you get Cosmos Connection string)
 
-    '''csharp
+    ```csharp
         {
           "IsEncrypted": false,
           "Values": {
@@ -19,7 +19,7 @@
             "cosmosConnectionString": "AccountEndpoint=https://localhost:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="
           }
         }
-    '''
+    ```
 
 - Add HTTP trigger
 
@@ -31,17 +31,17 @@
 
 - Delete all code and add DocumentDB binding
 
-    '''csharp
+    ```csharp
         [DocumentDB(databaseName:"salesdb",collectionName:"salescollection",CreateIfNotExists = true,CollectionThroughput = 1000,PartitionKey = "/sku",ConnectionStringSetting = "cosmosConnectionString")] IAsyncCollector<dynamic> outputDocument,
-    '''
+    ```
 
 - Add this code to body
 
-    '''csharp
+    ```csharp
       dynamic data = await req.Content.ReadAsAsync<object>();
       await outputDocument.AddAsync(data);
       return new HttpResponseMessage(HttpStatusCode.OK);
-    '''
+    ```
 
 - Run with both examples of different schemes and show saved data
 
@@ -49,7 +49,7 @@
 
 - Add code
 
-    '''csharp
+    ```csharp
         if (documents != null && documents.Count > 0)
         {
           foreach (var document in documents)
@@ -60,7 +60,7 @@
               log.Warning("No shipping!!!!");
           }
         }
-    '''
+    ```
 
 - Run, will fail, set leasecollection to autocreate and run again
 
@@ -70,7 +70,7 @@
 
 - Add code
 
-    '''csharp
+    ```csharp
       if (documents != null && documents.Count > 0)
       {
         foreach (var document in documents)
@@ -84,7 +84,7 @@
             log.Warning($"No tax!!!");
           }
         }
-    '''
+    ```
 
 - Run, will fail, set leasecollection to autocreate and run again
 
